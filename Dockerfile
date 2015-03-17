@@ -12,7 +12,6 @@ RUN apt-get update
 # Setup git
 RUN apt-get install -y --no-install-recommends ssh
 RUN apt-get install -y --no-install-recommends wget
-RUN apt-get install -y --no-install-recommends git
 RUN apt-get install -y --no-install-recommends unzip
 
 # Setup Jruby env
@@ -28,6 +27,12 @@ RUN /bin/ln -s /opt/jruby-$JRUBY_VERSION /opt/jruby
 
 # Setup application
 RUN mkdir -p $APP_ROOT
+
+# SET PERMISSIONS
+RUN chown -R $STOKESDRIFT_USER:$STOKESDRIFT_USER $APP_ROOT
+RUN chown -R $STOKESDRIFT_USER:$STOKESDRIFT_USER /opt/jruby/
+
+USER $STOKESDRIFT_USER
 WORKDIR $APP_ROOT
 
 ADD Gemfile $APP_ROOT/
@@ -43,21 +48,20 @@ ADD app/ $APP_ROOT/app/
 ADD drift_config.yml $APP_ROOT/
 ADD service-start.sh $APP_ROOT/
 
-# SET PERMISSIONS
-RUN chown -R $STOKESDRIFT_USER:$STOKESDRIFT_USER $APP_ROOT
-RUN chown -R $STOKESDRIFT_USER:$STOKESDRIFT_USER /opt/jruby/
+USER root
 RUN chmod +x $APP_ROOT/service-start.sh
+USER $STOKESDRIFT_USER
 
 # CLEAN UP
 RUN rm $APP_ROOT/Gemfile
 RUN rm $APP_ROOT/Gemfile.lock
-RUN app-get -y remove git
-RUN cat /opt/jruby/bin/stokesdrift
 
 # Debug
 RUN which stokesdrift
 
-USER $STOKESDRIFT_USER
+# FOR debug
+# ADD sd_start.sh /opt/jruby/lib/ruby/gems/shared/gems/stokesdrift-0.1.6/scripts/server_startup.sh
+# RUN chmod +x /opt/jruby/lib/ruby/gems/shared/gems/stokesdrift-0.1.6/scripts/server_startup.sh
 
 # Set default container command
 ENTRYPOINT $APP_ROOT/service-start.sh
