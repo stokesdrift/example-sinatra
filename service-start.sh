@@ -16,7 +16,11 @@ export JAVA_OPTS="${JAVA_OPTS} -XX:CompileCommand=dontinline,org.jruby.runtime.i
 export JAVA_OPTS="${JAVA_OPTS} -Djruby.management.enabled=false"
 export JAVA_OPTS="${JAVA_OPTS} -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true"
 export JAVA_OPTS="${JAVA_OPTS} -Dfile.encoding=UTF-8"
+export JAVA_OPTS="${JAVA_OPTS} -Djruby.home=${JRUBY_HOME}"
 
-export GEM_PATH=/opt/jruby/lib/ruby/gems/shared/gems
+export GEM_PATH=/opt/jruby/lib/ruby/gems/shared:/opt/jruby/lib/ruby/2.0
+export GEM_HOME=/opt/jruby/lib/ruby/gems/shared
+
+gem env
 
 stokesdrift # java $JAVA_OPTS org.stokesdrift.Server
